@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K8s Demo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        .container {
+            background-color: #252526;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3c3c3c;
+            width: 80%;
+            max-width: 600px;
+        }
+        h1 {
+            color: #569cd6;
+            text-align: center;
+            margin-top: 0;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #d4d4d4;
+            background-color: #0e639c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #1177bb;
+        }
+        pre {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 14px;
+            color: #9cdcfe;
+            border: 1px solid #3c3c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Frontend-Backend K8s Demo</h1>
+        <button id="fetch-btn">Получить данные с Backend</button>
+        <pre id="backend-data">Нажмите кнопку, чтобы загрузить данные...</pre>
+    </div>
+
+    <script>
+        const fetchButton = document.getElementById('fetch-btn');
+        const dataContainer = document.getElementById('backend-data');
+
+        async function fetchBackendData() {
+            dataContainer.textContent = 'Загрузка...';
+            try {
+                const response = await fetch('/api');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                dataContainer.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                dataContainer.textContent = `Ошибка при получении данных:\n${error}`;
+                dataContainer.style.color = '#ce9178';
+            }
+        }
+
+        fetchButton.addEventListener('click', fetchBackendData);
+        window.addEventListener('load', fetchBackendData);
+    </script>
+</body>
+</html>

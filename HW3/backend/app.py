@@ -5,14 +5,14 @@ import socket
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/api')
 def get_info():
     data = {
         "message": "Hello from Backend (кубер работает)!",
         "pod_hostname": os.environ.get('HOSTNAME', 'unknown'),
         "pod_ip": socket.gethostbyname(socket.gethostname()),
         "server_time_utc": datetime.datetime.utcnow().isoformat(),
-        "forwarded_by_frontend": request.headers.get('X-Frontend-Proxy', 'false')
+        "client_user_agent": request.headers.get('User-Agent')
     }
     return jsonify(data)
 
