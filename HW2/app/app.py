@@ -1,6 +1,6 @@
 import os
 import time
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request, redirect, url_for, render_template
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
@@ -36,8 +36,8 @@ def init_db():
     """)
     cur.execute("SELECT COUNT(*) FROM tasks;")
     if cur.fetchone()[0] == 0:
-        cur.execute("INSERT INTO tasks (title) VALUES (%s), (%s);",
-                    ("Настроить Docker Compose", "Проверить сохранение данных"))
+        cur.execute("INSERT INTO tasks (title, is_done) VALUES (%s, %s), (%s, %s);",
+                    ("Настроить Docker Compose", True, "Сделать красивый интерфейс", False))
     
     conn.commit()
     cur.close()
@@ -47,37 +47,11 @@ def init_db():
 def index():
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute('SELECT * FROM tasks ORDER BY created_at;')
+    cur.execute('SELECT * FROM tasks ORDER BY is_done, created_at DESC;')
     tasks = cur.fetchall()
     cur.close()
     conn.close()
-
-    html = """
-    <html>
-        <head><title>To-Do List</title></head>
-        <body>
-            <h1>Список задач</h1>
-            <form action="/add" method="post">
-                <input type="text" name="title" required>
-                <button type="submit">Добавить задачу</button>
-            </form>
-            <ul style="list-style: none; padding: 0;">
-    """
-    for task in tasks:
-        text_style = "text-decoration: line-through;" if task['is_done'] else ""
-        html += f"""
-            <li style="margin: 10px 0; display: flex; align-items: center;">
-                <form action="/toggle/{task['id']}" method="post" style="margin-right: 10px;">
-                    <input type="checkbox" {'checked' if task['is_done'] else ''} onchange="this.form.submit()">
-                </form>
-                <span style="{text_style}">{task['title']}</span>
-                <form action="/delete/{task['id']}" method="post" style="margin-left: auto;">
-                    <button type="submit" style="color: red; border: none; background: none; cursor: pointer;">&times;</button>
-                </form>
-            </li>
-        """
-    html += "</ul></body></html>"
-    return html
+    return render_template('index.html', tasks=tasks)
 
 @app.route('/add', methods=['POST'])
 def add_task():
