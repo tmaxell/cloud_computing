@@ -23,8 +23,8 @@
 
 1.  **Клонируйте репозиторий:**
     ```bash
-    git clone <URL вашего репозитория>
-    cd <название папки проекта>
+    git clone https://github.com/tmaxell/cloud_computing.git
+    cd cloud-computing/hw2
     ```
 
 2.  **Запустите приложение с помощью Docker Compose:**
